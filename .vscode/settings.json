@@ -1,0 +1,10 @@
+{
+  "sqltools.connections": [
+    {
+      "connectString": "oci:dbname=172.25.10.207/afimtrei;charset=UTF8",
+      "connectionTimeout": 30,
+      "dialect": "OracleDB",
+      "name": "Afim"
+    }
+  ]
+}
