@@ -22,4 +22,8 @@ export default createGlobalStyle`
     font-family: 'Montserrat', sans-serif;
 
   }
+
+  button {
+    cursor: pointer;
+  }
 `;
