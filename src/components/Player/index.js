@@ -1,5 +1,12 @@
-import React from "react";
+import React, { Fragment } from "react";
 import Slider from "rc-slider";
+import Sound from "react-sound";
+import PropTypes from "prop-types";
+
+import { connect } from "react-redux";
+
+import { bindActionCreators } from "redux";
+import { Creators as PlayerActions } from "../../store/ducks/player";
 
 import {
   Container,
@@ -19,30 +26,57 @@ import PauseIcon from "../../assets/images/pause.svg";
 import ForwardIcon from "../../assets/images/forward.svg";
 import RepeatIcon from "../../assets/images/repeat.svg";
 
-const Player = () => (
+const Player = ({
+  player,
+  duration,
+  position,
+  play,
+  pause,
+  next,
+  prev,
+  playing
+}) => (
   <Container>
-    <Current>
-      <img
-        src="https://www.music-bazaar.com/album-images/vol1/74/74070/570528-big/Times-Like-These-CD2-cover.jpg"
-        alt="Cover"
+    {!!player.currentSong && (
+      <Sound
+        url={player.currentSong.file}
+        playStatus={player.status}
+        onFinishedPlaying={next}
+        onPlaying={playing}
       />
-      <div>
-        <span>Times like these</span>
-        <small>Foo Fighters</small>
-      </div>
+    )}
+    <Current>
+      {!!player.currentSong && (
+        <Fragment>
+          <img
+            src={player.currentSong.thumbnail}
+            alt={player.currentSong.title}
+          />
+          <div>
+            <span>{player.currentSong.title}</span>
+            <small>{player.currentSong.author}</small>
+          </div>
+        </Fragment>
+      )}
     </Current>
     <Progress>
       <Controls>
         <button>
           <img src={ShuffleIcon} alt="Shuffle" />
         </button>
-        <button>
+        <button onClick={prev}>
           <img src={BackwardIcon} alt="Backward" />
         </button>
-        <button>
-          <img src={PlayIcon} alt="Play" />
-        </button>
-        <button>
+        {!!player.currentSong && player.status === Sound.status.PLAYING ? (
+          <button onClick={pause}>
+            <img src={PauseIcon} alt="Pause" />
+          </button>
+        ) : (
+          <button onClick={play}>
+            <img src={PlayIcon} alt="Play" />
+          </button>
+        )}
+        <button onClick={next}>
           <img src={ForwardIcon} alt="Forward" />
         </button>
         <button>
@@ -50,7 +84,7 @@ const Player = () => (
         </button>
       </Controls>
       <Time>
-        <span>1:36</span>
+        <span>{position}</span>
         <ProgressSlider>
           <Slider
             railStyle={{ background: "#404040", borderRadius: 10 }}
@@ -59,7 +93,7 @@ const Player = () => (
             value={25}
           />
         </ProgressSlider>
-        <span>5:25</span>
+        <span>{duration}</span>
       </Time>
     </Progress>
     <Volume>
@@ -74,4 +108,44 @@ const Player = () => (
   </Container>
 );
 
-export default Player;
+Player.propTypes = {
+  player: PropTypes.shape({
+    currentSong: PropTypes.shape({
+      file: PropTypes.string,
+      thumbnail: PropTypes.string,
+      title: PropTypes.string,
+      author: PropTypes.string
+    }),
+    status: PropTypes.string
+  }).isRequired,
+  play: PropTypes.func.isRequired,
+  pause: PropTypes.func.isRequired,
+  next: PropTypes.func.isRequired,
+  prev: PropTypes.func.isRequired,
+  playing: PropTypes.func.isRequired,
+  position: PropTypes.string.isRequired,
+  duration: PropTypes.string.isRequired
+};
+
+function msToTime(duration) {
+  let seconds = parseInt((duration / 1000) % 60, 10);
+  let minutes = parseInt((duration / (1000 * 60)) % 60, 10);
+
+  seconds = seconds < 10 ? `0${seconds}` : seconds;
+
+  return `${minutes}:${seconds}`;
+}
+
+const mapStateToProps = state => ({
+  player: state.player,
+  position: msToTime(state.player.position),
+  duration: msToTime(state.player.duration)
+});
+
+const mapDispatchToProps = dispatch =>
+  bindActionCreators(PlayerActions, dispatch);
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Player);
