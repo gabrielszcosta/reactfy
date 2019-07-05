@@ -28,18 +28,17 @@ import RepeatIcon from "../../assets/images/repeat.svg";
 
 const Player = ({
   player,
-  duration,
-  position,
   play,
   pause,
   next,
   prev,
   playing,
+  duration,
+  position,
   handlePosition,
   setPosition,
   positionShown,
   progress,
-  volume,
   setVolume
 }) => (
   <Container>
@@ -49,7 +48,7 @@ const Player = ({
         playStatus={player.status}
         onFinishedPlaying={next}
         onPlaying={playing}
-        position={playing.position}
+        position={player.position}
         volume={player.volume}
       />
     )}
@@ -135,7 +134,7 @@ Player.propTypes = {
   next: PropTypes.func.isRequired,
   prev: PropTypes.func.isRequired,
   playing: PropTypes.func.isRequired,
-  position: PropTypes.string.isRequired,
+  position: PropTypes.number.isRequired,
   duration: PropTypes.string.isRequired,
   positionShown: PropTypes.string.isRequired,
   progress: PropTypes.number.isRequired,

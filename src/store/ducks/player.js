@@ -19,7 +19,7 @@ const INITIAL_STATE = {
   positionShown: null,
   position: null,
   duration: null,
-  volume: 20
+  volume: 100
 };
 
 export default function player(state = INITIAL_STATE, action) {
@@ -88,9 +88,11 @@ export default function player(state = INITIAL_STATE, action) {
       };
 
     case Types.SET_POSITION:
+      console.log(state.position);
       return {
         ...state,
-        position: state.duration * action.payload.percent
+        position: state.duration * action.payload.percent,
+        positionShown: null
       };
 
     case Types.SET_VOLUME:
